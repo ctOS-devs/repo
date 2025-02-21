@@ -16,5 +16,5 @@ while true; do
         continue
     fi
 
-    sleep 1
+    sleep 300
 done
