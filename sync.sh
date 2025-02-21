@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # Check updates
 while true
 do
