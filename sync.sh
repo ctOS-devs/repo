@@ -13,6 +13,10 @@ while true; do
         git pull
         ./sign.sh # Sign after updating packages
     else
+	# In case when we builded packages locally
+	git add *
+	git commit -m 'Auto-update from local repo'
+	git push
         continue
     fi
 

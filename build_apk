@@ -1,0 +1,52 @@
+#!/usr/bin/env php
+<?php
+
+$path = '/apk';
+$directory = $argv[1] ?? 'main';
+$aVersion = $argv[2] ?? '1.0';
+$arch = $argv[3] ?? 'x86_64';
+
+$files = \glob("$path/v$aVersion/$directory/$arch/*.apk");
+$finalList = [];
+foreach ($files as $file) {
+    $file = str_replace("$path/v$aVersion/$directory/$arch/", '', $file);
+    $v = str_replace('-', '', strrchr($file, '-'));
+    
+    // Handle the case where the explode('~', $v) might not return two elements
+    $revisionParts = explode('~', $v);
+    $revision = $revisionParts[0] ?? '';
+    $architecture = $revisionParts[1] ?? '';
+
+    $name = substr(str_replace($v, '', $file), 0, -1);
+    $parts = explode('-', $name);
+    
+    // Check if the parts array has at least two elements
+    if (count($parts) >= 2) {
+        $last = array_pop($parts);
+        $parts = [implode('_', $parts), $last];
+
+        $packageName = $parts[0];
+        $packageVersion = $parts[1];
+
+        if (!isset($finalList[$packageName])) {
+            $finalList[$packageName] = [
+                'file' => $file,
+                'version' => $packageVersion . '-' . $revision
+            ];
+        } else {
+            if (\version_compare($packageVersion . "." . $revision, \str_replace('-', '.', $finalList[$packageName]['version']), ">=")) {
+                $finalList[$packageName] = [
+                    'file' => $file,
+                    'version' => $packageVersion . '-' . $revision
+                ];
+            }
+        }
+    }
+}
+
+$packageNames = array_values(array_map(function($el) {
+    return $el['file'];
+}, $finalList));
+
+// Fix the implode call: second argument should be a string separator, not an array
+echo implode(' ', $packageNames);
