@@ -7,6 +7,7 @@ while true; do
     # Fetch latest changes without merging
     git fetch origin
     #git pull
+    sleep 50
 
     # Check if the local branch is behind the remote branch
     if ! git diff --quiet HEAD origin/$(git rev-parse --abbrev-ref HEAD); then
@@ -20,5 +21,5 @@ while true; do
         continue
     fi
 
-    sleep 300
+    sleep 500
 done
